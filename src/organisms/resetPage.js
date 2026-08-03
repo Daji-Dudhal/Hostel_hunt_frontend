@@ -1,93 +1,110 @@
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // For toast styling
+import "react-toastify/dist/ReactToastify.css";
 
 const ResetPage = () => {
-  const [email, setEmail] = useState(""); // State to store the email input
+  const [email, setEmail] = useState("");
 
   const handleChange = (e) => {
-    setEmail(e.target.value); // Update email on change
+    setEmail(e.target.value);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Logic for password reset (e.g., sending an email with a reset link)
-    // For now, we show a success message
+
+    // TODO: Call your backend reset password API here
+
     toast.success("Password reset link sent to your email!");
 
-    // Reset the email field
     setEmail("");
   };
 
   const resetPageStyles = {
-    height: "100vh",
-    padding: "40px 20px",
-    backgroundColor: "#f8f9fa",
-    fontFamily: "'Roboto', sans-serif",
+    minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "#f5f7fa",
+    padding: "20px",
+    fontFamily: "Arial, sans-serif",
   };
 
   const formContainerStyles = {
-    maxWidth: "500px",
-    margin: "0 auto",
-    backgroundColor: "#fff",
-    borderRadius: "8px",
-    padding: "40px",
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+    width: "100%",
+    maxWidth: "450px",
+    background: "#fff",
+    padding: "35px",
+    borderRadius: "12px",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
   };
 
-  const inputFieldStyles = {
+  const titleStyles = {
+    textAlign: "center",
+    marginBottom: "10px",
+    color: "#2e7d32",
+  };
+
+  const subTitleStyles = {
+    textAlign: "center",
+    marginBottom: "25px",
+    color: "#666",
+    fontSize: "15px",
+  };
+
+  const inputStyles = {
     width: "100%",
     padding: "12px",
     marginBottom: "20px",
-    border: "1px solid #ddd",
+    border: "1px solid #ccc",
     borderRadius: "8px",
-    fontSize: "1rem",
-    color: "#333",
+    fontSize: "16px",
+    outline: "none",
+    boxSizing: "border-box",
   };
 
-  const submitButtonStyles = {
-    padding: "12px 30px",
-    backgroundColor: "#007bff",
+  const buttonStyles = {
+    width: "100%",
+    padding: "12px",
+    background: "#2e7d32",
     color: "#fff",
     border: "none",
-    borderRadius: "5px",
-    fontSize: "1rem",
+    borderRadius: "8px",
+    fontSize: "16px",
     cursor: "pointer",
-    transition: "background-color 0.3s",
-  };
-
-  const submitButtonHoverStyles = {
-    backgroundColor: "#0056b3",
-  };
-
-  const sectionTitleStyles = {
-    textAlign: "center",
-    marginBottom: "40px",
-    fontSize: "2.5rem",
-    color: "#333",
+    transition: "0.3s",
   };
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer position="top-right" autoClose={3000} />
+
       <div style={resetPageStyles}>
-        <h1 style={sectionTitleStyles}>Reset Your Password</h1>
         <div style={formContainerStyles}>
+          <h2 style={titleStyles}>Reset Password</h2>
+
+          <p style={subTitleStyles}>
+            Enter your registered email address to receive a password reset link.
+          </p>
+
           <form onSubmit={handleSubmit}>
             <input
               type="email"
-              name="email"
               placeholder="Enter your email"
               value={email}
               onChange={handleChange}
-              style={inputFieldStyles}
+              style={inputStyles}
               required
             />
+
             <button
               type="submit"
-              style={submitButtonStyles}
-              onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
-              onMouseOut={(e) => (e.target.style.backgroundColor = "#007bff")}
+              style={buttonStyles}
+              onMouseOver={(e) =>
+                (e.target.style.background = "#1b5e20")
+              }
+              onMouseOut={(e) =>
+                (e.target.style.background = "#2e7d32")
+              }
             >
               Send Reset Link
             </button>
