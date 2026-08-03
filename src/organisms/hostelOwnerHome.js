@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchHostels } from "../reduxSlices/hostelSlice"; // Import the thunk
-import HostelCard from "../molecules/hostelCard"; // Assuming you have this component
+import { fetchHostels } from "../reduxSlices/hostelSlice";
 import Header from "../atom/header";
-import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify"; // Importing toast
-import "react-toastify/dist/ReactToastify.css"; // Import toast styles
+import HostelCard from "../molecules/hostelCard";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import "../styles/ownerHome.css";
+
+const BASE_URL = "https://hostelhunt-backend-6.onrender.com";
 
 export const HostelOwnerHomePage = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const { hostelData, loading, error } = useSelector((state) => state.Hostel);
-
-  // State to manage form inputs and modal visibility
   const [showModal, setShowModal] = useState(false);
   const [hostelForm, setHostelForm] = useState({
     name: "",
@@ -24,200 +21,178 @@ export const HostelOwnerHomePage = () => {
     deposit: "",
   });
 
+  const { hostelData, loading, error } = useSelector((state) => state.Hostel);
+  const authUser = useSelector((state) => state.auth.user);
+
   useEffect(() => {
-    dispatch(fetchHostels("/hostel")); // Fetch hostels from API
+    dispatch(fetchHostels());
   }, [dispatch]);
 
-  // Handle input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setHostelForm({
-      ...hostelForm,
-      [name]: value,
-    });
+    setHostelForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const ownerData = {
-      id: 1,
-      name: "Gaurav",
-      contactInfo: "9876543210",
-      username: "gaurav123",
-      password: "gaurav@123",
-    };
-
-    const newHostelData = {
-      ...hostelForm,
-      owner: ownerData,
-    };
+    if (!authUser || !authUser.id) {
+      toast.error("You must be logged in as a hostel owner to add a hostel.");
+      return;
+    }
 
     try {
-      const response = await fetch("http://localhost:8000/hostel", {
+      const formattedHostel = {
+        ...hostelForm,
+        capacity: parseInt(hostelForm.capacity, 10),
+        rent: parseFloat(hostelForm.rent),
+        deposit: parseFloat(hostelForm.deposit),
+        owner: { id: authUser.id },
+      };
+
+      const response = await fetch(`${BASE_URL}/hostel`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newHostelData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formattedHostel),
       });
 
       if (!response.ok) {
-        throw new Error("Error adding hostel");
+        const errorText = await response.text();
+        throw new Error(errorText || "Unable to add hostel");
       }
 
-      const data = await response.json();
-      toast.success("Hostel added successfully!");
-      setShowModal(false); // Close the modal on successful submission
-      dispatch(fetchHostels("/hostel")); // Re-fetch hostels
-    } catch (error) {
-      toast.error(`Error: ${error.message}`);
+      toast.success("Hostel added successfully");
+      setShowModal(false);
+      setHostelForm({
+        name: "",
+        location: "",
+        imageurl: "",
+        capacity: "",
+        rent: "",
+        deposit: "",
+      });
+      dispatch(fetchHostels());
+    } catch (err) {
+      toast.error(err.message);
     }
   };
 
   return (
-    <div>
+    <div className="owner-home">
       <Header />
-      <ToastContainer /> {/* Toast notification container */}
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: "red" }}>Error: {error}</p>}
-      {/* <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+      <ToastContainer position="top-right" autoClose={2000} />
+
+      <div className="dashboard-header">
+        <div>
+          <h1>🏠 My Hostels</h1>
+          <p>Manage all your hostels from one place.</p>
+        </div>
+
+        <button className="add-hostel-btn" onClick={() => setShowModal(true)}>
+          + Add Hostel
+        </button>
+      </div>
+
+      {loading && (
+        <div className="loading">
+          <h3>Loading Hostels...</h3>
+        </div>
+      )}
+
+      {error && (
+        <div className="error-box">
+          <h3>{error}</h3>
+        </div>
+      )}
+
+      {!loading && hostelData?.length === 0 && (
+        <div className="empty-state">
+          <h2>No Hostels Found</h2>
+          <p>Click "Add Hostel" to create your first hostel.</p>
+        </div>
+      )}
+
+      <div className="hostel-grid">
         {hostelData?.map((hostel) => (
-          <HostelCard key={hostel.id} hostel={hostel} />
+          <HostelCard
+            key={hostel.id}
+            hostel={hostel}
+            handleclickOfCard={(selectedHostel) => console.log(selectedHostel)}
+          />
         ))}
-      </div> */}
-      <button
-        onClick={() => setShowModal(true)} // Open the modal
-        style={{
-          margin: "20px",
-          padding: "10px",
-          backgroundColor: "#4CAF50",
-          color: "white",
-          border: "none",
-          cursor: "pointer",
-        }}
-      >
-        Add Hostel
-      </button>
-      {/* Modal for adding hostel */}
+      </div>
+
       {showModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: "0",
-            left: "0",
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              width: "400px",
-              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <h2>Add New Hostel</h2>
-            <form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: "10px" }}>
-                <label>Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={hostelForm.name}
-                  onChange={handleInputChange}
-                  required
-                  style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-                />
-              </div>
-              <div style={{ marginBottom: "10px" }}>
-                <label>Location</label>
-                <input
-                  type="text"
-                  name="location"
-                  value={hostelForm.location}
-                  onChange={handleInputChange}
-                  required
-                  style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-                />
-              </div>
-              <div style={{ marginBottom: "10px" }}>
-                <label>Image URL</label>
-                <input
-                  type="text"
-                  name="imageurl"
-                  value={hostelForm.imageurl}
-                  onChange={handleInputChange}
-                  required
-                  style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-                />
-              </div>
-              <div style={{ marginBottom: "10px" }}>
-                <label>Capacity</label>
-                <input
-                  type="number"
-                  name="capacity"
-                  value={hostelForm.capacity}
-                  onChange={handleInputChange}
-                  required
-                  style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-                />
-              </div>
-              <div style={{ marginBottom: "10px" }}>
-                <label>Rent</label>
-                <input
-                  type="number"
-                  name="rent"
-                  value={hostelForm.rent}
-                  onChange={handleInputChange}
-                  required
-                  style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-                />
-              </div>
-              <div style={{ marginBottom: "10px" }}>
-                <label>Deposit</label>
-                <input
-                  type="number"
-                  name="deposit"
-                  value={hostelForm.deposit}
-                  onChange={handleInputChange}
-                  required
-                  style={{ width: "100%", padding: "8px", marginTop: "5px" }}
-                />
-              </div>
-              <div>
-                <button
-                  type="submit"
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#4CAF50",
-                    color: "white",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  Add Hostel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)} // Close the modal
-                  style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#f44336",
-                    color: "white",
-                    border: "none",
-                    cursor: "pointer",
-                    marginLeft: "10px",
-                  }}
-                >
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <div className="modal-header">
+              <h2>Add New Hostel</h2>
+              <button className="close-btn" onClick={() => setShowModal(false)}>
+                ✕
+              </button>
+            </div>
+
+            <form className="hostel-form" onSubmit={handleSubmit}>
+              <input
+                type="text"
+                name="name"
+                placeholder="Hostel Name"
+                value={hostelForm.name}
+                onChange={handleInputChange}
+                required
+              />
+
+              <input
+                type="text"
+                name="location"
+                placeholder="Location"
+                value={hostelForm.location}
+                onChange={handleInputChange}
+                required
+              />
+
+              <input
+                type="text"
+                name="imageurl"
+                placeholder="Image URL"
+                value={hostelForm.imageurl}
+                onChange={handleInputChange}
+                required
+              />
+
+              <input
+                type="number"
+                name="capacity"
+                placeholder="Capacity"
+                value={hostelForm.capacity}
+                onChange={handleInputChange}
+                required
+              />
+
+              <input
+                type="number"
+                name="rent"
+                placeholder="Monthly Rent"
+                value={hostelForm.rent}
+                onChange={handleInputChange}
+                required
+              />
+
+              <input
+                type="number"
+                name="deposit"
+                placeholder="Deposit"
+                value={hostelForm.deposit}
+                onChange={handleInputChange}
+                required
+              />
+
+              <div className="modal-buttons">
+                <button type="button" className="cancel-btn" onClick={() => setShowModal(false)}>
                   Cancel
+                </button>
+                <button type="submit" className="save-btn">
+                  Add Hostel
                 </button>
               </div>
             </form>
@@ -227,3 +202,5 @@ export const HostelOwnerHomePage = () => {
     </div>
   );
 };
+
+export default HostelOwnerHomePage;

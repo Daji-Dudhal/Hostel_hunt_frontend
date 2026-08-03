@@ -1,0 +1,223 @@
+.owner-home {
+  min-height: calc(100vh - 80px);
+  padding: 32px 32px 48px;
+  background: #f8fbff;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 32px 36px;
+  border-radius: 28px;
+  background: linear-gradient(135deg, #334155, #2563eb);
+  color: #f8fbff;
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.18);
+  margin-bottom: 28px;
+}
+
+.dashboard-header h1 {
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  margin: 0 0 6px;
+  letter-spacing: -0.04em;
+}
+
+.dashboard-header p {
+  margin: 0;
+  max-width: 560px;
+  line-height: 1.75;
+  color: rgba(248, 251, 255, 0.9);
+}
+
+.add-hostel-btn {
+  border: none;
+  border-radius: 999px;
+  background: #fb923c;
+  color: #ffffff;
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 18px 30px rgba(251, 146, 60, 0.25);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.add-hostel-btn:hover {
+  transform: translateY(-2px);
+  background: #f97316;
+}
+
+.loading,
+.error-box,
+.empty-state {
+  margin: 0 auto 28px;
+  padding: 32px 30px;
+  max-width: 840px;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
+  text-align: center;
+}
+
+.error-box {
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  background: #fef2f2;
+}
+
+.empty-state h2 {
+  margin: 0 0 10px;
+  font-size: 2.1rem;
+  color: #111827;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #475569;
+  font-size: 1rem;
+}
+
+.hostel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 22px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  z-index: 2000;
+}
+
+.modal-box {
+  width: min(560px, 100%);
+  background: #ffffff;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.23);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 30px 0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #0f172a;
+}
+
+.close-btn {
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: #e2e8f0;
+  color: #334155;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #cbd5e1;
+}
+
+.hostel-form {
+  display: grid;
+  gap: 16px;
+  padding: 24px 30px 30px;
+}
+
+.hostel-form input {
+  width: 100%;
+  min-height: 50px;
+  padding: 0 16px;
+  border-radius: 16px;
+  border: 1px solid #d1d5db;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hostel-form input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.cancel-btn,
+.save-btn {
+  min-width: 140px;
+  border: none;
+  border-radius: 999px;
+  padding: 14px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.cancel-btn {
+  background: #f3f4f6;
+  color: #334155;
+}
+
+.cancel-btn:hover {
+  transform: translateY(-1px);
+  background: #e5e7eb;
+}
+
+.save-btn {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.save-btn:hover {
+  transform: translateY(-1px);
+  background: #1d4ed8;
+}
+
+@media (max-width: 900px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .modal-box {
+    width: 100%;
+  }
+}
+
+@media (max-width: 620px) {
+  .owner-home {
+    padding: 20px 16px 32px;
+  }
+
+  .dashboard-header {
+    padding: 24px 20px;
+  }
+
+  .add-hostel-btn {
+    width: 100%;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+  }
+}

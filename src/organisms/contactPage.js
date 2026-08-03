@@ -10,6 +10,7 @@ export const ContactPage = () => {
     email: "",
     message: "",
   });
+  const [statusMessage, setStatusMessage] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,12 +18,53 @@ export const ContactPage = () => {
       ...formData,
       [name]: value,
     });
+    setStatusMessage(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    toast("Your message has been sent successfully!");
-    setFormData({ name: "", email: "", message: "" });
+    setStatusMessage(null);
+
+    try {
+      const response = await fetch("https://hostelhunt-backend-6.onrender.com/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        const statusCode = response.status;
+        const message = errorText || "Unable to send message. Please try again later.";
+
+        if (statusCode === 404) {
+          setStatusMessage({
+            type: "error",
+            text: "Contact endpoint not found on backend. Please deploy the backend with the /contact route.",
+          });
+        } else {
+          setStatusMessage({ type: "error", text: message });
+        }
+
+        toast.error(message);
+        return;
+      }
+
+      toast.success("Your message has been sent successfully!");
+      setStatusMessage({
+        type: "success",
+        text: "Message sent. If it still fails, check whether your backend deployment includes /contact.",
+      });
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      const message =
+        error.message ||
+        "Something went wrong. If the backend is not deployed or the endpoint is missing, this request may fail.";
+      setStatusMessage({ type: "error", text: message });
+      toast.error(message);
+    }
   };
 
   return (
@@ -62,6 +104,12 @@ export const ContactPage = () => {
             <button type="submit" className="submit-button">
               Send Message
             </button>
+
+            {statusMessage && (
+              <div className={`status-message ${statusMessage.type}`}>
+                {statusMessage.text}
+              </div>
+            )}
           </form>
         </div>
       </div>

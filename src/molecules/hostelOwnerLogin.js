@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../styles/auth.css";
 
 const HostelOwnerLogin = () => {
   const [name, setName] = useState("");
@@ -6,43 +7,52 @@ const HostelOwnerLogin = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-
-    console.log("Hostel Owner Login");
-    console.log("Name:", name);
-    console.log("Password:", password);
-
-    // TODO: Call your login API here
+    console.log("Hostel Owner Login", { name, password });
   };
 
   return (
-    <div className="login-container">
-      <h2>Hostel Owner Login</h2>
+    <div className="auth-shell auth-shell--compact">
+      <div className="auth-card auth-card--compact">
+        <div className="auth-card__content">
+          <div className="auth-card__header">
+            <p className="eyebrow">Hostel partner access</p>
+            <h2>Hostel Owner Login</h2>
+            <p>Manage your property and respond to bookings faster.</p>
+          </div>
 
-      <form className="login-form" onSubmit={handleLogin}>
-        <input
-          type="text"
-          name="name"
-          id="name"
-          placeholder="Enter your Username"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+          <form className="auth-form" onSubmit={handleLogin}>
+            <label className="form-field">
+              <span>Username</span>
+              <input
+                type="text"
+                name="name"
+                id="name"
+                placeholder="Enter your username"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </label>
 
-        <input
-          type="password"
-          name="password"
-          id="password"
-          placeholder="Enter your Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+            <label className="form-field">
+              <span>Password</span>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </label>
 
-        <button type="submit" className="login-btn">
-          Login
-        </button>
-      </form>
+            <button type="submit" className="primary-btn">
+              Login
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

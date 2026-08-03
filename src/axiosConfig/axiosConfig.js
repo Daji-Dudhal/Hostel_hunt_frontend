@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Define the base URL for your API
-const BASE_URL = "http://localhost:8000"; // Replace with your actual API base URL
+const BASE_URL = "https://hostelhunt-backend-6.onrender.com"; // Replace with your actual API base URL
 
 // Create an axios instance with default settings
 const axiosInstance = axios.create({

@@ -1,86 +1,75 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-// Initial state for the slice
+const BASE_URL = "https://hostelhunt-backend-6.onrender.com";
+
 const initialState = {
-  user: null, // To store user data after login
-  loading: false, // To track loading state (e.g., while logging in)
-  error: null, // To store any error message if login fails
+  user: null,
+  loading: false,
+  error: null,
 };
 
-// Create an asynchronous thunk action for login
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async ({ username, password, userType }, { rejectWithValue }) => {
     try {
-      // Determine the appropriate API endpoint based on the user type
       let url = "";
+
       if (userType === "student") {
-        url = `http://localhost:8000/student/login?username=${username}&password=${password}`;
+        url = `${BASE_URL}/student/login?username=${username}&password=${password}`;
       } else if (userType === "admin") {
-        url = `http://localhost:8000/admin/login?username=${username}&password=${password}`;
+        url = `${BASE_URL}/admin/login?username=${username}&password=${password}`;
       } else if (userType === "hostelOwner") {
-        url = `http://localhost:8000/hostelOwner/login?username=${username}&password=${password}`;
+        url = `${BASE_URL}/hostelOwner/login?username=${username}&password=${password}`;
+      } else {
+        throw new Error("Invalid user type");
       }
 
-      // Make the API call for logging in using fetch (GET request)
       const response = await fetch(url, {
-        method: "POST", // HTTP method changed to GET since we are sending params in the URL
+        method: "POST",
         headers: {
-          "Content-Type": "application/json", // Still setting the content type, though it's not really necessary for GET
+          "Content-Type": "application/json",
         },
       });
 
-      // If response status is not 200-299, throw an error
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to login");
+        throw new Error("Invalid username or password");
       }
 
-      // Parse the response as JSON
       const data = await response.json();
-      console.log("API response received:", data);
 
-      // Return the user data (or any other relevant data from the response)
       return data;
     } catch (error) {
-      // Return the error if something went wrong
-      return rejectWithValue(error.message || "Something went wrong"); // Reject with the error message
+      return rejectWithValue(error.message);
     }
   }
 );
 
-// Create the slice with reducers
 const authSlice = createSlice({
   name: "auth",
-  initialState, // Set initialState here
+  initialState,
   reducers: {
-    // You can add reducers like logout, reset error, etc. if needed
     logout: (state) => {
-      state.user = null; // Clear user data when logging out
+      state.user = null;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      // For login pending state
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
-        state.error = null; // Reset errors when initiating login
+        state.error = null;
       })
-      // For login fulfilled state (successful login)
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload; // Store user data
+        state.user = action.payload;
       })
-      // For login rejected state (login failed)
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload; // Store error message if login fails
+        state.error = action.payload;
       });
   },
 });
 
-// Export actions
 export const { logout } = authSlice.actions;
 
-// Export reducer
 export default authSlice.reducer;
